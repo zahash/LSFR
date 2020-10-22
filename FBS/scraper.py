@@ -1,2 +1,2 @@
-def scrape_instagram_url(url):
+def scrape_facebook_url(url):
     pass
