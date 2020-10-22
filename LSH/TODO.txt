@@ -1,0 +1,4 @@
+things to do in instagram face recognition
+
+duplicate indices removal
+show image after cropping
