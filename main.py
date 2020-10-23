@@ -21,6 +21,19 @@ def initialize(index_path="index"):
     return index
 
 
+def set_credentials(domain, username, password):
+    domain = domain.lower().strip()
+    if domain == "instagram":
+        credential_filepath = "./IGS/credentials.py"
+
+    elif domain == "facebook":
+        credential_filepath = "./FBS/credentials.py"
+
+    with open(credential_filepath, "w") as f:
+        f.write("username = '{}' \n".format(username))
+        f.write("password = '{}' \n".format(password))
+
+
 def get_faces(img_path):
     image = face_recognition.load_image_file(img_path)
 
