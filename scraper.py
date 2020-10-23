@@ -27,7 +27,7 @@ def scrape_url(url):
             latest_face_id = latest_face_id[0]
             _, _, _, latest_post_num, _ = parse_face_id(latest_face_id)
         else:
-            latest_post_num = -1
+            latest_post_num = 0
 
         for data in scrape_instagram_url(url, latest_post_num):
             yield data

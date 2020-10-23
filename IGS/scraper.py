@@ -8,7 +8,7 @@ ACCOUNT_NAME_PATTERN = re.compile("(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}")
 INSTAGRAM = Instagram()
 
 
-def scrape_instagram_url(url, latest_post_num=-1):
+def scrape_instagram_url(url, latest_post_num=0):
     account_name = extract_account_name_from_url(url)
     for data in scrape_instagram_account(account_name, latest_post_num):
         yield data
@@ -33,7 +33,7 @@ def download_image(url, filepath):
         handler.write(img_data)
 
 
-def scrape_instagram_account(account_name, latest_post_num=-1):
+def scrape_instagram_account(account_name, latest_post_num=0):
     INSTAGRAM.with_credentials(username, password)
     INSTAGRAM.login()
 
