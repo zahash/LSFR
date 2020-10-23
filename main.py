@@ -49,33 +49,33 @@ def query(index, mapper, face_encoding, k=10):
     return matches
 
 
-def add(index, urls):
+def add(index, url):
     with FaceDataSessionCM() as fd_session, FaceIndexSessionCM() as fi_session:
-        for url in urls:
-            print("Scraping URL: ", url)
-            for scraped_data in scrape_url(url):
-                img_id, post_url, img_url, saved_img_path = scraped_data
-                for face_data in get_faces(saved_img_path):
-                    if not face_data:
-                        continue
+        print("Scraping URL: ", url)
+        for scraped_data in scrape_url(url):
+            img_id, post_url, img_url, saved_img_path = scraped_data
+            for face_data in get_faces(saved_img_path):
+                if not face_data:
+                    continue
 
-                    face_num, face_loc, face_embedding = face_data
-                    face_id = "{}_{}".format(img_id, face_num)
+                face_num, face_loc, face_embedding = face_data
+                face_id = "{}_{}".format(img_id, face_num)
 
-                    add_data(
-                        session=fd_session,
-                        vec_id=face_id,
-                        face_embedding=face_embedding,
-                        face_loc=face_loc,
-                        post_url=post_url,
-                        img_url=img_url,
-                    )
+                add_data(
+                    session=fd_session,
+                    vec_id=face_id,
+                    face_embedding=face_embedding,
+                    face_loc=face_loc,
+                    post_url=post_url,
+                    img_url=img_url,
+                )
 
-                    index.add(session=fi_session, id=face_id, arr=face_embedding)
+                index.add(session=fi_session, id=face_id, arr=face_embedding)
 
 
 if __name__ == "__main__":
     urls = sys.argv[1:]
 
     index = initialize("index")
-    add(index, urls)
+    for url in urls:
+        add(index, url)
