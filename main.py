@@ -10,10 +10,6 @@ from mappers import default_sql_mapper
 
 import argparse
 
-ap = argparse.ArgumentParser(allow_abbrev=False)
-ap.add_argument("-i", "--index", type=str, required=True, help="name of the index")
-ap.add_argument("-u", "--urls", nargs="+", type=str, required=True, help="list of profile urls to scrape (space separated)")
-args = ap.parse_args()
 
 def initialize(index_path="index"):
     index = SQLDiskLSH(index_path)
@@ -91,6 +87,11 @@ def add(index, url):
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser(allow_abbrev=False)
+    ap.add_argument("-i", "--index", type=str, required=True, help="name of the index")
+    ap.add_argument("-u", "--urls", nargs="+", type=str, required=True, help="list of profile urls to scrape (space separated)")
+    args = ap.parse_args()
+
     index = initialize(args.index)
     for url in args.urls:
         add(index, url)
