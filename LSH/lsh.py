@@ -258,7 +258,7 @@ class SQLDiskLSH:
         self.index_dir = pathlib.Path(index_dir)
         self.hash_dir = self.index_dir / "hash_tables"
         self.params_file = self.index_dir / "params.json"
-        # database location goes here
+        self.hash_tables = []
 
     def set_params(self, num_tables, hash_size, embedding_size):
         """
@@ -284,6 +284,12 @@ class SQLDiskLSH:
 
         self._save_params()
         self._generate_hash_tables()
+
+        self.load_params()
+    
+    def load_params(self):
+        for table_num in range(self._params["num_tables"]):
+            self.hash_tables.append(np.load(self.hash_dir / "ht{}.npy".format(table_num)))
 
     def add(self, session, id, arr):
         """Index the given vector (or matrix) by calculating and storing the hash
@@ -399,8 +405,7 @@ class SQLDiskLSH:
 
         hashes = [[] for _ in range(arr.shape[0])]
 
-        for hash_table_filename in os.listdir(self.hash_dir):
-            hash_table = np.load(self.hash_dir / hash_table_filename)
+        for hash_table in self.hash_tables:
             hash_mat = np.matmul(arr, hash_table)
 
             for row_num, row in enumerate(hash_mat):
