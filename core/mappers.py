@@ -1,5 +1,5 @@
-from FaceData.models import FEmbed
-from FaceData.utils import SessionCM as FaceDataSessionCM
+from .FaceData.models import FEmbed
+from .FaceData.utils import SessionCM as FaceDataSessionCM
 
 
 def default_sql_mapper(face_id):

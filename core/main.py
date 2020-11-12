@@ -1,12 +1,12 @@
 import face_recognition
 
-from scraper import scrape_url
-from FaceData.add_face import add_data
-from FaceData.utils import SessionCM as FaceDataSessionCM
-from LSH.utils import SessionCM as FaceIndexSessionCM
-from LSH.lsh import SQLDiskLSH, NonEmptyDirectory
-from utils import pil_compatible_bb
-from mappers import default_sql_mapper
+from .scraper import scrape_url
+from .FaceData.add_face import add_data
+from .FaceData.utils import SessionCM as FaceDataSessionCM
+from .LSH.utils import SessionCM as FaceIndexSessionCM
+from .LSH.lsh import SQLDiskLSH, NonEmptyDirectory
+from .utils import pil_compatible_bb
+from .mappers import default_sql_mapper
 
 import argparse
 
@@ -24,10 +24,10 @@ def initialize(index_path="index"):
 def set_credentials(domain, username, password):
     domain = domain.lower().strip()
     if domain == "instagram":
-        credential_filepath = "./IGS/credentials.py"
+        credential_filepath = "./core/IGS/credentials.py"
 
     elif domain == "facebook":
-        credential_filepath = "./FBS/credentials.py"
+        credential_filepath = "./core/FBS/credentials.py"
 
     with open(credential_filepath, "w") as f:
         f.write("username = '{}' \n".format(username))
@@ -89,7 +89,14 @@ def add(index, url):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument("-i", "--index", type=str, required=True, help="name of the index")
-    ap.add_argument("-u", "--urls", nargs="+", type=str, required=True, help="list of profile urls to scrape (space separated)")
+    ap.add_argument(
+        "-u",
+        "--urls",
+        nargs="+",
+        type=str,
+        required=True,
+        help="list of profile urls to scrape (space separated)",
+    )
     args = ap.parse_args()
 
     index = initialize(args.index)
