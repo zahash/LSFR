@@ -35,7 +35,7 @@ def download_image(url, filepath):
 
 def scrape_instagram_account(account_name, latest_post_num=0):
     INSTAGRAM.with_credentials(username, password)
-    INSTAGRAM.login()
+    INSTAGRAM.login(True, True)
 
     account = INSTAGRAM.get_account(account_name)
     total_media_count = account.media_count
