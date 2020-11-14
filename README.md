@@ -29,13 +29,13 @@ First, you can setup the database configuration files (or just keep the default 
 Below example shows how to scrape an instagram profile to download all the images, store the face encodings and index them for easier search
 
 ```Python
+from core.LSH.lsh import SQLDiskLSH
 from core.main import set_credentials, initialize, add
 
 # set your instagram credentials to scrape instagram profiles
 set_credentials("instagram", "your-instagram-username", "your-instagram-password")
 
-# This is where you will store some important parameters and hash tables. NEVER LOSE THIS FOLDER
-index = initialize("some/folder/my_epic_index")
+index = SQLDiskLSH()
 
 # urls of profiles that you want to scrape
 urls = [
@@ -54,7 +54,7 @@ Now lets look at how to find matching faces
 from core.mappers import default_sql_mapper
 from core.main import initialize, query, get_faces
 
-index = initialize("some/folder/my_epic_index")
+index = SQLDiskLSH()
 
 faces = []
 for data in get_faces("some_image_that_has_a_face.jpg"):
