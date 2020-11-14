@@ -442,9 +442,9 @@ class SQLDiskLSH:
             ]
 
             with SessionCM() as session:
-                for htno, htable in hash_tables:
-                    for i in htable.shape[0]:
-                        for j in htable.shape[1]:
+                for htno, htable in enumerate(hash_tables):
+                    for i in range(htable.shape[0]):
+                        for j in range(htable.shape[1]):
                             val = hash_tables[htno][i][j]
                             db_row = HashTables(htno, i, j, val)
 
