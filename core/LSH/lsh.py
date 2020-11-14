@@ -429,7 +429,12 @@ class SQLDiskLSH:
                 np.zeros(shape=(EMBEDDING_SIZE, HASH_SIZE)) for _ in range(NUM_TABLES)
             ]
 
-            for htno, i, j, val in results:
+            for res in results:
+                htno = res.htno
+                i = res.i
+                j = res.j
+                val = res.val
+
                 hash_tables[htno][i][j] = val
 
             return hash_tables
