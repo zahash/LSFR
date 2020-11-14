@@ -7,9 +7,10 @@ from sqlalchemy import func, and_
 from collections import defaultdict
 
 from .base import Base, ENGINE
-from .models import Index
+from .models import Index, HashTables
 from .utils import SessionCM, commit_add_db_row
 from .minmaxheap import MinKList
+from .config import NUM_TABLES, HASH_SIZE, EMBEDDING_SIZE
 
 Base.metadata.create_all(ENGINE)
 
@@ -254,42 +255,8 @@ class SQLDiskLSH:
     Disk based (with SQL) Locality Sensitive Hashing using Random Projection with Multiple hash tables
     """
 
-    def __init__(self, index_dir="./index"):
-        self.index_dir = pathlib.Path(index_dir)
-        self.hash_dir = self.index_dir / "hash_tables"
-        self.params_file = self.index_dir / "params.json"
-        self.hash_tables = []
-
-    def set_params(self, num_tables, hash_size, embedding_size):
-        """
-        This method will save the given params to a json file inside <index_dir>
-        and also generate and save the hash tables inside <index_dir>/hash_tables
-
-        Args:
-            num_tables: number of hash tables (random projection)
-            hash_size: number of bits (or) number of output dimensions; Eg: 128 length input vector will be converted to a 8 bit index
-            embedding_size: the length of each embedding vector; Eg: 128
-        """
-        if os.path.isdir(self.index_dir) and os.listdir(self.index_dir):
-            raise NonEmptyDirectory("The folder specified by index_dir must be empty")
-
-        self._params = {}
-        self._params["num_tables"] = num_tables
-        self._params["hash_size"] = hash_size
-        self._params["embedding_size"] = embedding_size
-
-        self.index_dir.mkdir(parents=True, exist_ok=True)
-        self.hash_dir.mkdir(parents=True, exist_ok=True)
-        # initialize the database here
-
-        self._save_params()
-        self._generate_hash_tables()
-
-        self.load_params()
-    
-    def load_params(self):
-        for table_num in range(self._params["num_tables"]):
-            self.hash_tables.append(np.load(self.hash_dir / "ht{}.npy".format(table_num)))
+    def __init__(self):
+        self.hash_tables = self._get_hash_tables()
 
     def add(self, session, id, arr):
         """Index the given vector (or matrix) by calculating and storing the hash
@@ -451,27 +418,36 @@ class SQLDiskLSH:
 
         return similar
 
-    def _save_params(self):
-        """ saves params to the file <index_dir>/params.json """
-        with self.params_file.open("w") as f:
-            json.dump(self._params, f, indent=4, sort_keys=True)
+    def _get_hash_tables(self):
+        with SessionCM() as session:
+            results = session.query(HashTables).all()
 
-    def _generate_hash_tables(self):
-        """generates and saves each hash table in its own file
-        Eg:
-            <index_dir>/hash_tables/ht0.npy
-            <index_dir>/hash_tables/ht1.npy
-            .
-            .
-            .
-            <index_dir>/hash_tables/ht<num_tables>.npy
-        """
+        # if the index database already contains hashtables
+        # then just return them
+        if results:
+            hash_tables = [
+                np.zeros(shape=(EMBEDDING_SIZE, HASH_SIZE)) for _ in range(NUM_TABLES)
+            ]
 
-        for table_num in range(self._params["num_tables"]):
-            np.save(
-                (self.hash_dir / "ht{}.npy".format(table_num)),
-                np.random.randn(
-                    self._params["embedding_size"], self._params["hash_size"]
-                ),
-            )
+            for htno, i, j, val in results:
+                hash_tables[htno][i][j] = val
 
+            return hash_tables
+
+        # if the index database doesn't contain hashtables,
+        # then generate the hashtables, store them in db and return them
+        else:
+            hash_tables = [
+                np.random.randn(EMBEDDING_SIZE, HASH_SIZE) for _ in range(NUM_TABLES)
+            ]
+
+            with SessionCM() as session:
+                for htno, htable in hash_tables:
+                    for i in htable.shape[0]:
+                        for j in htable.shape[1]:
+                            val = hash_tables[htno][i][j]
+                            db_row = HashTables(htno, i, j, val)
+
+                            commit_add_db_row(session, db_row)
+
+            return hash_tables

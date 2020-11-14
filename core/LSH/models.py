@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Text, Integer, Float
 from sqlalchemy.schema import PrimaryKeyConstraint
 
 from .base import Base
@@ -25,3 +25,23 @@ class Index(Base, AutoRepr):
         self.vec_id = vec_id
         self.hash_bucket = hash_bucket
         self.euc_bucket = euc_bucket
+
+
+class HashTables(Base, AutoRepr):
+    __tablename__ = "htables"
+
+    htno = Column(Integer)
+    i = Column(Integer)
+    j = Column(Integer)
+    val = Column(Float)
+
+    __table_args__ = (
+        PrimaryKeyConstraint(htno, i, j),
+        {},
+    )
+
+    def __init__(self, htno, i, j, val):
+        self.htno = htno
+        self.i = i
+        self.j = j
+        self.val = val

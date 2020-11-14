@@ -11,16 +11,6 @@ from .mappers import default_sql_mapper
 import argparse
 
 
-def initialize(index_path="index"):
-    index = SQLDiskLSH(index_path)
-    try:
-        index.set_params(49, 7, 128)
-    except NonEmptyDirectory:
-        pass
-
-    return index
-
-
 def set_credentials(domain, username, password):
     domain = domain.lower().strip()
     if domain == "instagram":
@@ -88,7 +78,6 @@ def add(index, url):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(allow_abbrev=False)
-    ap.add_argument("-i", "--index", type=str, required=True, help="name of the index")
     ap.add_argument(
         "-u",
         "--urls",
@@ -99,6 +88,6 @@ if __name__ == "__main__":
     )
     args = ap.parse_args()
 
-    index = initialize(args.index)
+    index = SQLDiskLSH()
     for url in args.urls:
         add(index, url)
