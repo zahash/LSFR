@@ -2,6 +2,7 @@ import face_recognition
 
 from .scraper import scrape_url
 from .FaceData.add_face import add_data
+from .FaceData.models import FData, FLoc
 from .FaceData.utils import SessionCM as FaceDataSessionCM
 from .LSH.utils import SessionCM as FaceIndexSessionCM
 from .LSH.lsh import SQLDiskLSH, NonEmptyDirectory
@@ -47,7 +48,27 @@ def get_faces(img_path):
 
 def query(index, mapper, face_encoding, k=10):
     with FaceIndexSessionCM() as session:
-        matches = index.query(session, mapper, face_encoding, k=k)
+        matching_id_dist = index.query(session, mapper, face_encoding, k=k)
+
+    matches = []
+    with FaceDataSessionCM() as session:
+        for match in matching_id_dist:
+            post_data = session.query(FData).filter(FData.vec_id == match.l_id).all()
+            post_data = post_data[0]
+
+            loc_data = session.query(FLoc).filter(FLoc.vec_id == match.l_id).all()
+            loc_data = sorted(loc_data, key=lambda x: x.loc_idx)
+            loc_data = [l.loc_val for l in loc_data]
+
+            data = {
+                "id": post_data.vec_id,
+                "post_url": post_data.post_url,
+                "img_url": post_data.img_url,
+                "loc": loc_data,
+                "dist": match.dist,
+            }
+
+            matches.append(data)
 
     return matches
 
