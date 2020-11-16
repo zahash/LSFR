@@ -3,25 +3,15 @@ import urllib.request
 from flask import Flask, request, redirect, jsonify
 from werkzeug.utils import secure_filename
 
-from core.main import get_faces, query
-from core.mappers import default_sql_mapper
 from core.LSH.lsh import SQLDiskLSH
-
-
-class NoFacesFound(Exception):
-    pass
-
-
-class MultipleFacesFound(Exception):
-    pass
-
+from utils import get_matches, NoFacesFound, MultipleFacesFound
 
 app = Flask(__name__)
 app.secret_key = "YqiK4tFTuoz1QRXmegYTVqwJsFLFnhbPrRPSsnndk5yIYxKU"
 app.config["UPLOAD_FOLDER"] = "./uploads"
 ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg"])
 
-index = SQLDiskLSH()
+INDEX = SQLDiskLSH()
 
 
 def allowed_file(filename):
@@ -46,7 +36,7 @@ def upload_file():
         file.save(filepath)
 
         try:
-            matches = get_matches(filepath)
+            matches = get_matches(INDEX, filepath)
             resp = jsonify({"matches": matches})
             resp.status_code = 201
 
@@ -63,27 +53,6 @@ def upload_file():
         )
         resp.status_code = 400
         return resp
-
-
-def get_matches(filepath, k=10):
-    faces = []
-    for data in get_faces(filepath):
-        faces.append(data)
-
-    if len(faces) == 0:
-        raise NoFacesFound(
-            "No face is detected in the image. Please make sure that the image has atleast one face"
-        )
-    elif len(faces) > 1:
-        raise MultipleFacesFound(
-            "multiple faces detected in the image. Please crop the image to have a single face"
-        )
-    else:
-        face_data = faces[0]
-        face_num, face_loc, face_embedding = face_data
-        matches = query(index, default_sql_mapper, face_embedding, k=k)
-
-    return matches
 
 
 if __name__ == "__main__":
