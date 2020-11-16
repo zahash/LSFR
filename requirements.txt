@@ -4,3 +4,5 @@ numpy==1.19.2
 igramscraper==0.3.5
 requests==2.24.0
 Flask==1.1.2
+Flask-HTTPAuth==4.1.0
+Pyrebase==3.0.27

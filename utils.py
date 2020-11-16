@@ -1,3 +1,5 @@
+import json
+
 from core.main import get_faces, query
 from core.mappers import default_sql_mapper
 
@@ -29,3 +31,10 @@ def get_matches(index, filepath, k=10):
         matches = query(index, default_sql_mapper, face_embedding, k=k)
 
     return matches
+
+
+def _parse_firebase_error(e):
+    error_json = e.args[1]
+    error = json.loads(error_json)
+    error_code = error["error"]["code"]
+    return error, error_code
