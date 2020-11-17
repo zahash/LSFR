@@ -1,4 +1,4 @@
-curl -u zahash.z@gmail.com:test-pass -i -X \
+curl -u zahash.z@gmail.com:test123 -i -X \
 GET http://127.0.0.1:5000/auth/token
 
 curl -i -X POST -H "Content-Type: application/json" \
@@ -9,6 +9,6 @@ curl -i -X POST -H "Content-Type: application/json" \
 -d '{"email":"zahash.z@gmail.com"}' \
 http://127.0.0.1:5000/auth/reset-password
 
-curl POST -u YOUR_TOKEN:unused \
+curl -i -X POST -u YOUR_TOKEN:unused \
 --form 'file=@/home/zahash/Desktop/test_images/verit.png' \
 'http://localhost:5000/'
