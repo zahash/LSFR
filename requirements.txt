@@ -5,4 +5,5 @@ igramscraper==0.3.5
 requests==2.24.0
 Flask==1.1.2
 Flask-HTTPAuth==4.1.0
+Flask-Cors==3.0.9
 Pyrebase==3.0.27

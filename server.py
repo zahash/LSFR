@@ -3,6 +3,7 @@ import urllib.request
 import requests
 from flask import Flask, request, redirect, jsonify, g
 from flask_httpauth import HTTPBasicAuth
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 from core.LSH.lsh import SQLDiskLSH
@@ -12,6 +13,8 @@ from auth.token_system import generate_auth_token, verify_auth_token
 from auth.firebase_authentication import firebase_auth
 
 app = Flask(__name__)
+CORS(app)
+
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["UPLOAD_FOLDER"] = "./uploads"
 ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg"])
