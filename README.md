@@ -8,7 +8,7 @@ Facial Recognition Software system to store and index millions of face-fingerpri
 
 ## Installation
 
-Must have an NVIDIA gpu and cuda libraries installed for face recognition to work
+It's recommended (but not necessary) to have an NVIDIA gpu with cuda libraries installed for face recognition to work reasonably fast
 
 OS X & Linux:
 
