@@ -5,4 +5,8 @@ venv
 .env
 .venv
 
-LSFR.zip
+*.png
+*.jpg
+*.jpeg
+
+*.sqlite
