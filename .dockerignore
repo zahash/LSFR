@@ -1,0 +1,12 @@
+__pycache__/
+
+env/
+venv/
+.env/
+.venv/
+
+*.png
+*.jpg
+*.jpeg
+
+*.sqlite
