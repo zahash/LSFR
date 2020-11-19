@@ -10,4 +10,4 @@ COPY . /app
 
 RUN pip3 install -r requirements.txt
 
-RUN export SECRET_KEY="63JqSZnhpDlZrEOgsvj3AUmTCYZza4nPIEzchKibzWnvwyRi"
+CMD ["uwsgi", "app.ini"]
